@@ -1,26 +1,27 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class OrderItem extends Model
+return new class extends Migration
 {
-    use HasFactory;
-
-    protected $table = 'order_items';
-
-    protected $fillable = [
-        'order_id',
-        'product_id',
-        'quantity',
-        'price'
-    ];
-
-    // Relasi balik ke Order
-    public function order()
+    public function up(): void
     {
-        return $this->belongsTo(Order::class, 'order_id');
+        Schema::create('order_items', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('product_id');
+            $table->integer('quantity');
+            $table->decimal('price', 12, 2);
+            $table->timestamps();
+
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+        });
     }
-}
+
+    public function down(): void
+    {
+        Schema::dropIfExists('order_items');
+    }
+};

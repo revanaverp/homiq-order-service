@@ -1,25 +1,24 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Order extends Model
+return new class extends Migration
 {
-    use HasFactory;
-
-    protected $table = 'orders';
-
-    protected $fillable = [
-        'user_id',
-        'total_price',
-        'status'
-    ];
-
-    // Relasi One-to-Many ke OrderItem (Satu order punya banyak item belanjaan)
-    public function items()
+    public function up(): void
     {
-        return $this->hasMany(OrderItem::class, 'order_id');
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->decimal('total_price', 12, 2);
+            $table->enum('status', ['PENDING', 'PAID', 'CANCELLED'])->default('PENDING');
+            $table->timestamps();
+        });
     }
-}
+
+    public function down(): void
+    {
+        Schema::dropIfExists('orders');
+    }
+};
