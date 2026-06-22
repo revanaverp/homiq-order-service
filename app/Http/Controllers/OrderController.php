@@ -25,11 +25,11 @@ class OrderController extends Controller
         $totalPrice = 0;
 
         // --- REST CALL: Mengarah ke DNS Service Container Docker Milik Cienly ---
-        $productServiceUrl = "http://product-service/api/products/";
+        $productServiceUrl = "http://homiq-product-nginx/api/products/";
 
         foreach ($request->items as $item) {
             // Melakukan pengecekan stok langsung ke Product Service via jaringan internal Docker
-            $response = Http::timeout(5)->get($productServiceUrl . $item['product_id']);
+            $response = Http::timeout(20)->get($productServiceUrl . $item['product_id']);
 
             if ($response->failed()) {
                 return response()->json([
@@ -37,7 +37,7 @@ class OrderController extends Controller
                 ], 404);
             }
 
-            $productData = $response->json();
+            $productData = $response->json()['data'] ?? $response->json();
 
             // Validasi kecukupan stok riil dari Product Service
             if ($productData['stock'] < $item['quantity']) {
